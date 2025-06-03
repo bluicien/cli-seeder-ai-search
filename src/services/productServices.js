@@ -13,7 +13,7 @@ export const getProductByTitle = async (title) => {
 }
 
 export const addProduct = async (title, description = "", startPrice, reservePrice) => {
-    if (!title && parseFloat(startPrice === "NaN" && parseFloat(reservePrice) === "NaN")) {
+    if (!title && isNaN(startPrice) && isNaN(reservePrice)) {
         console.error("Missing required data fields, or invalid data types.");
         return;
     }

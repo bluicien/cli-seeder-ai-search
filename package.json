@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Phase I of Mission 5. Contains API route and CLI data seeder tool.",
   "main": "server.js",
+  "preferGlobal": true,
+  "bin": {
+    "mongo-seeder": "./src/cliSeederTool/commands.js"
+  },
   "scripts": {
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -37,5 +41,6 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "supertest": "^7.1.1"
-  }
+  },
+  "type": "module"
 }
