@@ -1,4 +1,5 @@
 import inquirer from "inquirer";
+import { parseCsvToJson } from "./fileParseUtil.js";
 
 const FILE_ENTRY="file";
 const MANUAL_ENTRY="manual";
@@ -112,17 +113,13 @@ async function fileDataEntry() {
             {
                 type: "input",
                 name: "dataFilePath",
-                message: "Please enter the path to you file data (CSV/JSON): ",
-                validate: (input) => {
-                    if (typeof input === "string" && !input.trim())
-                            return "File path must not be empty. Please enter path to your file."
-                    return true;
-                }
+                message: "Please enter the path to you file data (CSV/JSON): "
             }
         ];
 
         const answer = await inquirer.prompt(question);
-        return answer.dataFilePath;
+        answer.dataFilePath ? parseCsvToJson(answer.dataFilePath) : parseCsvToJson();
+        return;
     } catch (err) {
         console.log(err);
     }
