@@ -3,14 +3,25 @@ import inquirer from "inquirer";
 const FILE_ENTRY="file";
 const MANUAL_ENTRY="manual";
 
-export const dataSeeding = async () => {
-    const seedingMethod = await getSeedingMethod();
-    if (seedingMethod.seedMethod === MANUAL_ENTRY) {
-        const newProductData = await manualDataEntry();
 
+// Run data seeding prompts.
+export const dataSeeding = async () => {
+    const seedMethod = await getSeedingMethod();
+
+    if (seedMethod === MANUAL_ENTRY) {
+        let continueManualEntry = false;
+        do {
+            const newProductData = await manualDataEntry();
+            console.log(newProductData);
+            continueManualEntry = askUserContinueManualInput();
+        } while (continueManualEntry);
+    } else if (seedMethod === FILE_ENTRY) {
+        fileDataEntry()
     }
 }
 
+
+// Prompt user for how they want to seed data.
 async function getSeedingMethod() {
     try {
         const question = [{
@@ -29,13 +40,15 @@ async function getSeedingMethod() {
                 ]
         }];
         const answer = await inquirer.prompt(question);
-        return answer;
+        return answer.seedMethod;
     } catch (err) {
         console.error(err);
         
     }
 }
 
+
+// Prompt user with questions for data to new product.
 async function manualDataEntry() {
     try {
         const questions = [
@@ -76,6 +89,41 @@ async function manualDataEntry() {
         return answers
     } catch (err) {
         console.error(err);
-        
+    }
+}
+
+
+// Prompt the user if they want to keep entering data manually.
+async function askUserContinueManualInput() {
+    const question = [{
+        type: "confirm",
+        name: "continueEntry",
+        message: "Do you want to continue manual entry?"
+    }];
+    const answer = inquirer.prompt(question);
+    return answer.continueEntry;
+}
+
+
+// Prompt user if they want to upload via csv/json file.
+async function fileDataEntry() {
+    try {
+        const question = [
+            {
+                type: "input",
+                name: "dataFilePath",
+                message: "Please enter the path to you file data (CSV/JSON): ",
+                validate: (input) => {
+                    if (typeof input === "string" && !input.trim())
+                            return "File path must not be empty. Please enter path to your file."
+                    return true;
+                }
+            }
+        ];
+
+        const answer = await inquirer.prompt(question);
+        return answer.dataFilePath;
+    } catch (err) {
+        console.log(err);
     }
 }
