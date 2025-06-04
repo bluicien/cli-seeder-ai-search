@@ -1,0 +1,32 @@
+[
+    {
+        "title": "Smart Desk Lamp",
+        "description": "A sleek and modern lamp with adjustable brightness and color temperature.",
+        "startPrice": "49.99",
+        "reservePrice": "75.00"
+    },
+    {
+        "title": "Wireless Earbuds",
+        "description": "Noise-canceling Bluetooth earbuds with 10 hours of battery life.",
+        "startPrice": "89.99",
+        "reservePrice": "120.00"
+    },
+    {
+        "title": "Gaming Keyboard",
+        "description": "Mechanical keyboard with RGB back lighting and programmable keys.",
+        "startPrice": "59.99",
+        "reservePrice": "90.00"
+    },
+    {
+        "title": "Portable Projector",
+        "description": "Compact HD projector with built-in speakers and wireless connectivity.",
+        "startPrice": "149.99",
+        "reservePrice": "200.00"
+    },
+    {
+        "title": "Smart Coffee Maker",
+        "description": "Wi-Fi-enabled coffee maker with customizable brew settings.",
+        "startPrice": "99.99",
+        "reservePrice": "130.00"
+    }
+]
