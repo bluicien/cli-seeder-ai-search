@@ -33,7 +33,7 @@ export const getProductByTitle = async (title) => {
 }
 
 export const addProduct = async (title, description = "", startPrice, reservePrice) => {
-    if (!title && isNaN(startPrice) && isNaN(reservePrice)) {
+    if (!title || isNaN(startPrice) || isNaN(reservePrice)) {
         console.error("Missing required data fields, or invalid data types.");
         return;
     }
@@ -55,7 +55,7 @@ export const addProduct = async (title, description = "", startPrice, reservePri
 
 export const addProductsFromList = async (arrayOfProducts) => {
     try {
-        if (!Array.isArray(arrayOfProducts) && arrayOfProducts.length <= 0) {
+        if (!Array.isArray(arrayOfProducts)) {
             throw new Error("Type Error: Please enter a valid array")
         };
 

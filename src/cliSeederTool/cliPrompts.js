@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import { parseCsvToJson } from "./fileParseUtil.js";
 import chalk from "chalk";
-import { addProductsFromList } from "../services/productServices.js";
+import { addProduct, addProductsFromList } from "../services/productServices.js";
 
 const FILE_ENTRY="file";
 const MANUAL_ENTRY="manual";
@@ -20,9 +20,10 @@ export const dataSeedingManager = async () => {
             let continueManualEntry = false;
             do {
                 const newProductData = await manualDataEntry();
-                addProduct({...newProductData});
+                const { title, description, startPrice, reservePrice } = newProductData;
+                await addProduct( title, description, startPrice, reservePrice );
 
-                continueManualEntry = askUserContinueManualInput();
+                continueManualEntry = await askUserContinueManualInput();
             } while (continueManualEntry);
         } else if (seedMethod === FILE_ENTRY) {
             const filePath = await fileDataEntry()
@@ -109,7 +110,6 @@ async function manualDataEntry() {
             name: "startPrice",
             message: "What is the start price?",
             validate: (input) => {
-                console.log(input)
                 if (isNaN(input)) 
                     return "Price must be a number.";
                 return true;
@@ -149,9 +149,9 @@ async function askUserContinueManualInput() {
     }];
 
     try {
-        const answer = inquirer.prompt(question);
+        const answer = await inquirer.prompt(question);
         return answer.continueEntry;
-    } catch (error) {
+    } catch (err) {
         if (err && err.name === "ExitPromptError") {
             console.log(chalk.yellow("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));
             process.exit(0);

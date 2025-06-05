@@ -9,20 +9,24 @@ export const parseCsvToJson = async (filePath="src/data/data.json") => {
     else if (fileExt === "json") { // Handle if JSON data file.
         const jsonFile = fs.readFileSync(filePath);
         const parsedJson = JSON.parse(jsonFile);
-        console.info("JSON File Data Read");
+        console.info(chalk.green("JSON File Data Read"));
         return parsedJson;
     }
     else if (fileExt === "csv") { // Handle if CSV data file.
-        const fileData = [];
-        fs.createReadStream(filePath)
-            .pipe(csv())
-            .on("data", (data) => fileData.push(data))
-            .on("end", () => {
-                // console.log(fileData)
-                console.log(chalk.blueBright("File data parsed"))
-            })
-            .on("error", (err) => console.error(err));
-        return fileData;
+        return new Promise((res, rej) => {
+            const fileData = [];
+            fs.createReadStream(filePath)
+                .pipe(csv())
+                .on("data", (data) => fileData.push(data))
+                .on("end", () => {
+                    console.log(chalk.green("File data parsed"));
+                    res(fileData);
+                })
+                .on("error", (err) =>  {
+                    console.error(err);
+                    rej(err)
+                });
+        });
     }
 
     return;
