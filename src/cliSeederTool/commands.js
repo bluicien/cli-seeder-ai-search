@@ -4,7 +4,7 @@ import { program } from "commander";
 import chalk from "chalk";
 
 import { dataSeedingManager, deleteAllConfirm } from "./cliPrompts.js";
-import { getAllProducts, getProductById, deleteProductById, deleteAllProducts, addProduct } from "../services/productServices.js";
+import { getAllProducts, getProductById, deleteProductById, deleteAllProducts, addProduct } from "../services/productsServices.js";
 import { connectMongoDB } from "../db/db.js";
 
 program

@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import { parseCsvToJson } from "./fileParseUtil.js";
 import chalk from "chalk";
-import { addProduct, addProductsFromList } from "../services/productServices.js";
+import { addProduct, addProductsFromList } from "../services/productsServices.js";
 
 const FILE_ENTRY="file";
 const MANUAL_ENTRY="manual";
