@@ -1,8 +1,8 @@
-import { getProductByTitle } from "../services/productsServices";
-import express from "express";
+import { searchWithGemini } from "../services/geminiServices.js";
+
 
 export const searchKeyword = async (req, res) => {
     const { keywords } = req.body;
-    const foundProduct = getProductByTitle(keywords)
+    const foundProduct = await searchWithGemini(keywords);
     res.status(200).json(foundProduct)
 }

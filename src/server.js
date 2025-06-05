@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
     res.send("Server is running.");
 });
 
-app.use("/api/products")
+app.use("/api/products", productRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

@@ -24,8 +24,11 @@ export const getProductById = async (_id) => {
 export const getProductByTitle = async (title) => {
     if (!title) return null; // If no product is entered. Return nothing.
 
+    console.log("Searching with", title);
     try {
-        const product = await Product.find({title});
+        const product = await Product.find({
+            title: { $regex: new RegExp(`^${title}$`, 'i') }
+        });
         return product;
     } catch (err) {
         console.error(err);
