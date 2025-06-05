@@ -12,7 +12,7 @@ process.on("SIGINT", () => {
 });
 
 // Run data seeding prompts.
-export const dataSeeding = async () => {
+export const dataSeedingManager = async () => {
     try {
         const seedMethod = await getSeedingMethod();
     
@@ -31,7 +31,7 @@ export const dataSeeding = async () => {
             await addProductsFromList(dataToSeed);
             return;
         }
-    } catch (error) {
+    } catch (err) {
         if (err && err.name === "ExitPromptError") {
             console.log(chalk.yellow("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));
             process.exit(0);

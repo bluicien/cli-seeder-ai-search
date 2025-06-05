@@ -3,13 +3,13 @@
 import { program } from "commander";
 import chalk from "chalk";
 
-import { dataSeeding, deleteAllConfirm } from "./cliPrompts.js";
-import { getAllProducts, getProductById, deleteProductById, deleteAllProducts } from "../services/productServices.js";
+import { dataSeedingManager, deleteAllConfirm } from "./cliPrompts.js";
+import { getAllProducts, getProductById, deleteProductById, deleteAllProducts, addProduct } from "../services/productServices.js";
 import { connectMongoDB } from "../db/db.js";
 
 program
     .version("1.0.0")
-    .name("mongodb-seeder")
+    .name("mongo-seeder")
     .description("CLI Data Seeding Tool");
 
 program
@@ -17,19 +17,42 @@ program
     .alias("s")
     .description("Seed data to MongoDB.\nRun with no options to open CLI UI.\n")
     .option("-f, --file <file-path>", "Seed data from file")
-    .option("-p, --product <product-details...>", "Seed data in order of arguments <title> <description> <start-price> <reserve-price>")
+    .option("-p, --product <product-details...>", "Seed data in order of arguments <title> <start-price> <reserve-price> [description]")
     .action(async (option) => {
         if (option.product) {
             // Handle manual product upload
+            if (option.product.length < 3) {
+                console.info(chalk.red("Please at least 3 arguments. <title> <start-price> <reserve-price>"))
+                process.exit(1);
+            }
+
+            const [ title, arg2, arg3, arg4 ] = option.product;
+            let description, startPrice, reservePrice;
+
+            if (option.product.length === 3) {
+                description = "";
+                startPrice = arg2;
+                reservePrice = arg3;
+            } else {
+                description = arg2
+                startPrice = arg3;
+                reservePrice = arg4;
+            }
+
+            const newProduct = await addProduct(title, description, startPrice, reservePrice);
+            console.log(chalk.green("New Product Added: "));
+            console.log(newProduct);
         } 
         else if (option.file) {
             // Handle file upload
+            const dataToSeed = await (option.file ? parseCsvToJson(option.file) : parseCsvToJson());
+            
+            await addProductsFromList(dataToSeed);
         }
         else if (Object.keys(option).length <= 0) {
             // If no options passed in, run CLI UI.
-            await dataSeeding();
+            await dataSeedingManager();
         }
-
         process.exit(0);
     });
 

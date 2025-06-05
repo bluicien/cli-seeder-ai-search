@@ -40,12 +40,14 @@ export const addProduct = async (title, description = "", startPrice, reservePri
 
     try {
         const newProduct = new Product({
-            title: title, description,
-            description: description, 
+            title: title,
+            description: description,
             startPrice: Number(startPrice),
             reservePrice: Number(reservePrice)
         });
-        newProduct.save();
+        await newProduct.save();
+        
+        return newProduct;
     } catch (err) {
         console.error(err);
     }
