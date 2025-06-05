@@ -1,15 +1,34 @@
-import { Product } from "../models/product";
+import { Product } from "../models/product.js";
 
 export const getAllProducts = async () => {
-    const allProducts = await Product.find({});
-    return allProducts;
+    try {
+        const allProducts = await Product.find({});
+        return allProducts;
+    } catch (err) {
+        console.error(err);   
+    }
+}
+
+export const getProductById = async (_id) => {
+    if (!_id) return null;
+
+    try {
+        const product = await Product.findById(_id);
+        return product;
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 export const getProductByTitle = async (title) => {
     if (!title) return null; // If no product is entered. Return nothing.
 
-    const product = await Product.find({title});
-    return product;
+    try {
+        const product = await Product.find({title});
+        return product;
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 export const addProduct = async (title, description = "", startPrice, reservePrice) => {
@@ -18,19 +37,35 @@ export const addProduct = async (title, description = "", startPrice, reservePri
         return;
     }
 
-    const newProduct = new Product({
-        title: title, description,
-        description: description, 
-        startPrice: Number(startPrice),
-        reservePrice: Number(reservePrice)
-    });
-    newProduct.save();
-
+    try {
+        const newProduct = new Product({
+            title: title, description,
+            description: description, 
+            startPrice: Number(startPrice),
+            reservePrice: Number(reservePrice)
+        });
+        newProduct.save();
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 export const deleteProductById = async (_id) => {
     if (!_id) return;
 
-    await Product.deleteOne({_id});
-    return;
+    try {
+        await Product.deleteOne({_id});
+        return;
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+export const deleteAllProducts = async () => {
+    try {
+        await Product.deleteMany({});
+        return;
+    } catch (err) {
+        console.error(err);
+    }
 }

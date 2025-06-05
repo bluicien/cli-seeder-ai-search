@@ -2,7 +2,10 @@
 
 import { program } from "commander";
 import chalk from "chalk";
-import { dataSeeding } from "./cliPrompts.js";
+
+import { dataSeeding, deleteAllConfirm } from "./cliPrompts.js";
+import { getAllProducts, getProductById, deleteProductById, deleteAllProducts } from "../services/productServices.js";
+import { connectMongoDB } from "../db/db.js";
 
 program
     .version("1.0.0")
@@ -26,14 +29,18 @@ program
             // If no options passed in, run CLI UI.
             dataSeeding();
         }
+
+        process.exit(0);
     });
 
 program
     .command("get-product <_id>")
     .alias("gp")
     .description("Get Single Product by _id.\n")
-    .action(async () => {
+    .action(async (_id) => {
         // Get single product by _id
+        console.log(await getProductById(_id));
+        process.exit(0);
     });
 
 program
@@ -42,14 +49,18 @@ program
     .description("Get all products.\n")
     .action(async () => {
         // Get all products.
+        console.log(await getAllProducts());
+        process.exit(0);
     });
 
 program
     .command("delete-product <_id>")
     .alias("dp")
     .description("Delete single product by _id.\n")
-    .action(async () => {
+    .action(async (_id) => {
         // Delete single product
+        await deleteProductById(_id);
+        process.exit(0);
     });
 
 program
@@ -58,7 +69,26 @@ program
     .description("Delete all products from database.\n")
     .action(async () => {{
         // Delete all products.
+        const deleteData = await deleteAllConfirm();
+        if (deleteData === true)
+            await deleteAllProducts();
+        else 
+            console.info(chalk.greenBright("Deletion Cancelled."));
+        
+        process.exit(0);
     }})
 
 
-program.parse(process.argv);
+    
+async function main() {
+    try {
+        await connectMongoDB();
+        console.log(chalk.green.bold("Connected to MongoDB.\n")); 
+        program.parse(process.argv);
+    } catch (err) {
+        console.error(chalk.red("Fatal error:"), err);
+        process.exit(1);
+    }
+}
+
+main();
