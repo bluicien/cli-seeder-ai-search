@@ -1,6 +1,7 @@
 import inquirer from "inquirer";
 import { parseCsvToJson } from "./fileParseUtil.js";
 import chalk from "chalk";
+import { addProductsFromList } from "../services/productServices.js";
 
 const FILE_ENTRY="file";
 const MANUAL_ENTRY="manual";
@@ -19,11 +20,16 @@ export const dataSeeding = async () => {
             let continueManualEntry = false;
             do {
                 const newProductData = await manualDataEntry();
-                console.log(newProductData);
+                addProduct({...newProductData});
+
                 continueManualEntry = askUserContinueManualInput();
             } while (continueManualEntry);
         } else if (seedMethod === FILE_ENTRY) {
-            fileDataEntry()
+            const filePath = await fileDataEntry()
+            const dataToSeed = await (filePath ? parseCsvToJson(filePath) : parseCsvToJson());
+            
+            await addProductsFromList(dataToSeed);
+            return;
         }
     } catch (error) {
         if (err && err.name === "ExitPromptError") {
@@ -167,8 +173,7 @@ async function fileDataEntry() {
     
     try {
         const answer = await inquirer.prompt(question);
-        answer.dataFilePath ? parseCsvToJson(answer.dataFilePath) : parseCsvToJson();
-        return;
+        return answer.dataFilePath;
     } catch (err) {
         if (err && err.name === "ExitPromptError") {
             console.log(chalk.yellow("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));

@@ -27,7 +27,7 @@ program
         }
         else if (Object.keys(option).length <= 0) {
             // If no options passed in, run CLI UI.
-            dataSeeding();
+            await dataSeeding();
         }
 
         process.exit(0);

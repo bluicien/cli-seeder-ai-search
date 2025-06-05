@@ -18,7 +18,7 @@ export const parseCsvToJson = async (filePath="src/data/data.json") => {
             .pipe(csv())
             .on("data", (data) => fileData.push(data))
             .on("end", () => {
-                console.log(fileData)
+                // console.log(fileData)
                 console.log(chalk.blueBright("File data parsed"))
             })
             .on("error", (err) => console.error(err));

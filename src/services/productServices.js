@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { Product } from "../models/product.js";
 
 export const getAllProducts = async () => {
@@ -50,11 +51,27 @@ export const addProduct = async (title, description = "", startPrice, reservePri
     }
 }
 
+export const addProductsFromList = async (arrayOfProducts) => {
+    try {
+        if (!Array.isArray(arrayOfProducts) && arrayOfProducts.length <= 0) {
+            throw new Error("Type Error: Please enter a valid array")
+        };
+
+        console.log("Products to Insert: ", arrayOfProducts)
+        await Product.insertMany(arrayOfProducts);
+
+    } catch (err) {
+        console.error(err.message);
+    }
+    
+}
+
 export const deleteProductById = async (_id) => {
     if (!_id) return;
 
     try {
-        await Product.deleteOne({_id});
+        const deletedProduct = await Product.deleteOne({_id});
+        console.info(chalk.green.bold("Product has been deleted: "), deletedProduct);
         return;
     } catch (err) {
         console.error(err);
@@ -64,6 +81,7 @@ export const deleteProductById = async (_id) => {
 export const deleteAllProducts = async () => {
     try {
         await Product.deleteMany({});
+        console.info(chalk.green.bold("Database has been cleared!"));
         return;
     } catch (err) {
         console.error(err);
