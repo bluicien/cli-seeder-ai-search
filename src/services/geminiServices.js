@@ -30,26 +30,33 @@ const functionsToolKit = {
     }
 }
 
-export const searchWithGemini = async (keywords) => {
-    const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
-        contents: "Find a gaming keyboard.",
-        config: {
-            tools: [{
-                functionDeclarations: [fetchProductByTitleFunctionDeclaration]
-            }],
-        },
-    });
-
-    if (response.functionCalls && response.functionCalls.length > 0) {
-        const functionCall = response.functionCalls[0];
-        console.log(`Function to call: ${functionCall.name}`);
-        console.log(`Arguments: ${JSON.stringify(functionCall.args)}`);
-        const functionCallResponse = await functionsToolKit[functionCall.name](functionCall.args);
-        return functionCallResponse;
-    } else {
-        console.log("No function call found in your response");
-        console.log(response.text);
+export const searchWithGemini = async (searchPhrase) => {
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: searchPhrase,
+            config: {
+                tools: [{
+                    functionDeclarations: [fetchProductByTitleFunctionDeclaration]
+                }],
+            },
+        });
+    
+        if (response.functionCalls && response.functionCalls.length > 0) {
+            const functionCall = response.functionCalls[0];
+            console.log(`Function to call: ${functionCall.name}`);
+            console.log(`Arguments: ${JSON.stringify(functionCall.args)}`);
+            const functionCallResponse = await functionsToolKit[functionCall.name](functionCall.args);
+            return functionCallResponse;
+        } else {
+            console.log("No function call found in your response");
+            console.log(response.text);
+        }
+    } catch (err) {
+        if (err && err.message) {
+            console.error("Error in Gemini API Call.", err.message);
+            
+        }
     }
 }    
 

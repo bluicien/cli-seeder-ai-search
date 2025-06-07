@@ -27,7 +27,7 @@ export const getProductByTitle = async (title) => {
     console.log("Searching with", title);
     try {
         const product = await Product.find({
-            title: { $regex: new RegExp(`^${title}$`, 'i') }
+            title: { $regex: title, $options: "i" }
         });
         return product;
     } catch (err) {

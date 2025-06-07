@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { searchKeyword } from "../controllers/productsController.js";
+import { searchByPhrase } from "../controllers/productsController.js";
 
 const router = Router();
 
-router.get("/search-keywords", searchKeyword);
+router.get("/search-phrase", searchByPhrase);
 
 export default router;
