@@ -22,9 +22,9 @@ export const getProductById = async (_id) => {
 }
 
 export const getProductByTitle = async (title) => {
-    if (!title) return null; // If no product is entered. Return nothing.
+    if (!title) return []; // If no product is entered. Return empty array.
 
-    console.log("Searching with", title);
+    console.log("Searching partial match for: ", title);
     try {
         const product = await Product.find({
             title: { $regex: title, $options: "i" }
@@ -35,6 +35,50 @@ export const getProductByTitle = async (title) => {
     }
 }
 
+export const getProductByTitleExactMatch = async (title) => {
+    if (!title) return [];
+
+    console.log("Searching exact match for: ", title)
+    try {
+        const product = await Product.find({
+            title: { $regex: `^${title}$`, $options: "i" }
+        });
+
+        return product
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+
+export const getProductByKeyword = async (arrayOfKeywords) => {
+    if (Array.isArray(arrayOfKeywords)) throw new Error("ERROR: Argument must be an array"); // Throw error if argument is not array
+    if (arrayOfKeywords.length <= 0) return []; // Return empty array if no keywords entered.
+    
+    const searchKeywords  = arrayOfKeywords.join(" ");
+
+    try {
+        const products = await Product.find(
+            { $text: { $search: searchKeywords } },
+            { score: { $meta: "textScore" } }
+        ).sort({ score: { $meta: "textScore" } });
+
+        return products;
+    } catch (err) {
+        
+    }
+
+}
+
+
+/**
+ * This function adds a single new product into MongoDB via Mongoose.
+ * @param {string} title - Title/Name of the product.
+ * @param {string} description - Description of the product (optional).
+ * @param {number} startPrice - Starting price for the product.
+ * @param {number} reservePrice - Reserve price, minimum bid for auction.
+ * @returns The new product that was created.
+ */
 export const addProduct = async (title, description = "", startPrice, reservePrice) => {
     if (!title || isNaN(startPrice) || isNaN(reservePrice)) {
         console.error("Missing required data fields, or invalid data types.");
@@ -56,6 +100,14 @@ export const addProduct = async (title, description = "", startPrice, reservePri
     }
 }
 
+
+
+
+/**
+ * This function takes an array of product objects and inserts into MongoDB via Mongoose.
+ * @param {string[]} arrayOfProducts
+ * @returns Returns a void Promise.
+ */
 export const addProductsFromList = async (arrayOfProducts) => {
     try {
         if (!Array.isArray(arrayOfProducts)) {
@@ -64,12 +116,13 @@ export const addProductsFromList = async (arrayOfProducts) => {
 
         console.log("Products to Insert: ", arrayOfProducts)
         await Product.insertMany(arrayOfProducts);
-
+        return;
     } catch (err) {
         console.error(err.message);
     }
     
 }
+
 
 export const deleteProductById = async (_id) => {
     if (!_id) return;
