@@ -1,45 +1,27 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import dotenv from "dotenv";
+import dotenv, { config } from "dotenv";
 
-import { getProductByTitle } from './productsServices.js';
+import { functionsToolKit, productFunctions } from '../utils/functionDeclarations';
+
 
 dotenv.config();
 
 // Configure the client
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// Function declaration
-const fetchProductByTitleFunctionDeclaration = {
-    name: "fetchProductByTitle",
-    description: "Searches for a 1 or more products by its title.",
-    parameters: {
-        type: Type.OBJECT,
-        properties: {
-            title: {
-                type: Type.STRING,
-                description: "The title or name of the product"
-            }
-        },
-        required: ["title"]
-    }
-}
+const config = {
+    tools: [{
+        functionDeclarations: productFunctions
+    }],
+};
 
-const functionsToolKit = {
-    fetchProductByTitle: ({title}) => {
-        return getProductByTitle(title);
-    }
-}
 
 export const searchWithGemini = async (searchPhrase) => {
     try {
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
             contents: searchPhrase,
-            config: {
-                tools: [{
-                    functionDeclarations: [fetchProductByTitleFunctionDeclaration]
-                }],
-            },
+            config: config,
         });
     
         if (response.functionCalls && response.functionCalls.length > 0) {
@@ -55,7 +37,6 @@ export const searchWithGemini = async (searchPhrase) => {
     } catch (err) {
         if (err && err.message) {
             console.error("Error in Gemini API Call.", err.message);
-            
         }
     }
 }    

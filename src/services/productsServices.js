@@ -21,21 +21,8 @@ export const getProductById = async (_id) => {
     }
 }
 
+
 export const getProductByTitle = async (title) => {
-    if (!title) return []; // If no product is entered. Return empty array.
-
-    console.log("Searching partial match for: ", title);
-    try {
-        const product = await Product.find({
-            title: { $regex: title, $options: "i" }
-        });
-        return product;
-    } catch (err) {
-        console.error(err);
-    }
-}
-
-export const getProductByTitleExactMatch = async (title) => {
     if (!title) return [];
 
     console.log("Searching exact match for: ", title)
@@ -51,9 +38,24 @@ export const getProductByTitleExactMatch = async (title) => {
 }
 
 
-export const getProductByKeyword = async (arrayOfKeywords) => {
-    if (Array.isArray(arrayOfKeywords)) throw new Error("ERROR: Argument must be an array"); // Throw error if argument is not array
-    if (arrayOfKeywords.length <= 0) return []; // Return empty array if no keywords entered.
+export const getProductByTitlePartialMatch = async (title) => {
+    if (!title) return []; // If no product is entered. Return empty array.
+
+    console.log("Searching partial match for: ", title);
+    try {
+        const product = await Product.find({
+            title: { $regex: title, $options: "i" }
+        });
+        return product;
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+
+export const getProductsByKeywords = async (keywords) => {
+    if (Array.isArray(keywords)) throw new Error("ERROR: Argument must be an array"); // Throw error if argument is not array
+    if (keywords.length <= 0) return []; // Return empty array if no keywords entered.
     
     const searchKeywords  = arrayOfKeywords.join(" ");
 
