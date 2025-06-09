@@ -1,6 +1,12 @@
+// productsServices.js
 import chalk from "chalk";
 import { Product } from "../models/product.js";
 
+
+/**
+ * Retrieves all documents from products collection.
+ * @returns List of products
+ */
 export const getAllProducts = async () => {
     try {
         const allProducts = await Product.find({});
@@ -10,6 +16,12 @@ export const getAllProducts = async () => {
     }
 }
 
+
+/**
+ * Queries MongoDB for a match to the ObjectId (_id) passed as argument.
+ * @param {string} _id - ObjectId string that is used to match the _id in MongoDB.
+ * @returns Returns a single document object.
+ */
 export const getProductById = async (_id) => {
     if (!_id) return null;
 
@@ -22,6 +34,11 @@ export const getProductById = async (_id) => {
 }
 
 
+/**
+ * Queries MongoDB for exact matches to the string passed as argument.
+ * @param {string} title - Title of the product.
+ * @returns Returns an array of the product(s) found.
+ */
 export const getProductByTitle = async (title) => {
     if (!title) return [];
 
@@ -38,6 +55,11 @@ export const getProductByTitle = async (title) => {
 }
 
 
+/**
+ * Queries MongoDB for partial matches of the string passed as argument.
+ * @param {string} title - Partial match of product title.
+ * @returns Returns an array of the product(s) found.
+ */
 export const getProductByTitlePartialMatch = async (title) => {
     if (!title) return []; // If no product is entered. Return empty array.
 
@@ -47,12 +69,18 @@ export const getProductByTitlePartialMatch = async (title) => {
             title: { $regex: title, $options: "i" }
         });
         return product;
+
     } catch (err) {
         console.error(err);
     }
 }
 
 
+/**
+ * 
+ * @param {string} keywords 
+ * @returns 
+ */
 export const getProductsByKeywords = async (keywords) => {
     if (!Array.isArray(keywords)) throw new Error("ERROR: Argument must be an array"); // Throw error if argument is not array
     if (keywords.length <= 0) return []; // Return empty array if no keywords entered.
@@ -65,10 +93,10 @@ export const getProductsByKeywords = async (keywords) => {
         ).sort({ score: { $meta: "textScore" } });
 
         return products;
-    } catch (err) {
-        
-    }
 
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 
@@ -93,15 +121,14 @@ export const addProduct = async (title, description = "", startPrice, reservePri
             startPrice: Number(startPrice),
             reservePrice: Number(reservePrice)
         });
-        await newProduct.save();
         
+        await newProduct.save();
         return newProduct;
+
     } catch (err) {
         console.error(err);
     }
 }
-
-
 
 
 /**
@@ -118,13 +145,18 @@ export const addProductsFromList = async (arrayOfProducts) => {
         console.log("Products to Insert: ", arrayOfProducts)
         await Product.insertMany(arrayOfProducts);
         return;
+
     } catch (err) {
-        console.error(err.message);
+        console.error(err);
     }
-    
 }
 
 
+/**
+ * Takes a MongoDB ObjectId string as argument and deletes one product matching the _id.
+ * @param {string} _id - ObjectId string that is used to match the _id in MongoDB.
+ * @returns 
+ */
 export const deleteProductById = async (_id) => {
     if (!_id) return;
 
@@ -132,16 +164,23 @@ export const deleteProductById = async (_id) => {
         const deletedProduct = await Product.deleteOne({_id});
         console.info(chalk.green.bold("Product has been deleted: "), deletedProduct);
         return;
+
     } catch (err) {
         console.error(err);
     }
 }
 
+
+/**
+ * Clears all entries in products database.
+ * @returns Returns a void promise
+ */
 export const deleteAllProducts = async () => {
     try {
         await Product.deleteMany({});
         console.info(chalk.green.bold("Database has been cleared!"));
         return;
+
     } catch (err) {
         console.error(err);
     }

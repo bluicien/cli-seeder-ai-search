@@ -1,3 +1,4 @@
+// functionDeclarations.js
 import { Type } from "@google/genai";
 import { getProductByTitle, getProductByTitlePartialMatch, getProductsByKeywords } from "../services/productsServices.js";
 
