@@ -1,5 +1,5 @@
 import { Type } from "@google/genai";
-import { getProductByTitle, getProductByTitlePartialMatch, getProductsByKeywords } from "../services/productsServices";
+import { getProductByTitle, getProductByTitlePartialMatch, getProductsByKeywords } from "../services/productsServices.js";
 
 const fetchProductByTitleFunctionDeclaration = {
     name: "fetchProductByTitle",
@@ -32,7 +32,7 @@ const fetchProductsByTitlePartialMatchFunctionDeclaration = {
 }
 
 const fetchProductsByKeywordsDeclaration = {
-    name: "fetchProductByKeywords",
+    name: "fetchProductsByKeywords",
     description: "Retrieves products where the title or description contains any of the specified keywords.",
     parameters: {
         type: Type.OBJECT,
@@ -51,7 +51,7 @@ const fetchProductsByKeywordsDeclaration = {
 export const functionsToolKit = {
     fetchProductByTitle: ({ title }) => getProductByTitle(title),
     fetchProductByTitlePartialMatch: ({ title }) => getProductByTitlePartialMatch(title),
-    fetchProductsByKeywords: ({ keywords }) => getProductsByKeywords(keywords),
+    fetchProductsByKeywords: ({ arrayOfKeywords }) => getProductsByKeywords(arrayOfKeywords),
 };
 
 

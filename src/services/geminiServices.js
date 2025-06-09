@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import dotenv, { config } from "dotenv";
+import dotenv from "dotenv";
 
-import { functionsToolKit, productFunctions } from '../utils/functionDeclarations';
+import { functionsToolKit, productFunctions } from '../utils/functionDeclarations.js';
 
 
 dotenv.config();
@@ -18,6 +18,7 @@ const config = {
 
 export const searchWithGemini = async (searchPhrase) => {
     try {
+        console.log(searchPhrase)
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
             contents: searchPhrase,
@@ -28,6 +29,7 @@ export const searchWithGemini = async (searchPhrase) => {
             const functionCall = response.functionCalls[0];
             console.log(`Function to call: ${functionCall.name}`);
             console.log(`Arguments: ${JSON.stringify(functionCall.args)}`);
+            console.log(functionCall.args)
             const functionCallResponse = await functionsToolKit[functionCall.name](functionCall.args);
             return functionCallResponse;
         } else {
@@ -36,7 +38,7 @@ export const searchWithGemini = async (searchPhrase) => {
         }
     } catch (err) {
         if (err && err.message) {
-            console.error("Error in Gemini API Call.", err.message);
+            console.error("Error in Gemini API Call.", err);
         }
     }
 }    

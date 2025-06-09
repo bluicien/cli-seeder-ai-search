@@ -54,10 +54,9 @@ export const getProductByTitlePartialMatch = async (title) => {
 
 
 export const getProductsByKeywords = async (keywords) => {
-    if (Array.isArray(keywords)) throw new Error("ERROR: Argument must be an array"); // Throw error if argument is not array
+    if (!Array.isArray(keywords)) throw new Error("ERROR: Argument must be an array"); // Throw error if argument is not array
     if (keywords.length <= 0) return []; // Return empty array if no keywords entered.
-    
-    const searchKeywords  = arrayOfKeywords.join(" ");
+    const searchKeywords  = keywords.join(" ");
 
     try {
         const products = await Product.find(
