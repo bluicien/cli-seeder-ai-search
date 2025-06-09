@@ -1,18 +1,16 @@
 // geminiServices.js
 
 import { GoogleGenAI } from '@google/genai';
-import dotenv from "dotenv";
 
 import { functionsToolKit, productFunctions } from '../utils/functionDeclarations.js';
-
-dotenv.config();
+import config from '../config/config.js';
 
 
 // Connect to Gemini API with key.
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: config.geminiApiKey });
 
 // Configure Gemini API with the function declarations.
-const config = {
+const geminiConfig = {
     tools: [{
         functionDeclarations: productFunctions
     }],
@@ -31,7 +29,7 @@ export const searchWithGemini = async (searchPhrase) => {
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
             contents: searchPhrase,
-            config: config,
+            config: geminiConfig,
         });
     
         if (response.functionCalls && response.functionCalls.length > 0) {
