@@ -46,7 +46,7 @@ export const allProducts = async (req, res) => {
 
 
 // Retrieves a single product that has an exact match with the URL parameter on /api/products/:title
-export const singleProduct = async (req, res) => {
+export const productByTitle = async (req, res) => {
     const { title } = req.params;
     if (!title?.trim())
         return res.status(400).json({ error: "Product name must be specified"})

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// commands.js
+
 import { program } from "commander";
 import chalk from "chalk";
 
