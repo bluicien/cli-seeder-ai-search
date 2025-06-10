@@ -11,7 +11,7 @@ export const errorAlert = (message = "", err) => chalk.red(`${message} ${err?.st
 export const success = chalk.greenBright;
 
 // Information headings (e.g., section titles, important info)
-export const informationHeading = chalk.blueBright.bold.underline;
+export const informationHeading = chalk.greenBright.bold.underline;
 
 // General information (e.g., status updates, normal output)
 export const information = chalk.blueBright;
