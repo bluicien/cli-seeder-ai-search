@@ -1,7 +1,7 @@
 // productsServices.js
 
-import chalk from "chalk";
 import { Product } from "../models/product.js";
+import { errorAlert, information, success, warning } from "../utils/chalkSchema.js";
 
 
 /**
@@ -10,10 +10,13 @@ import { Product } from "../models/product.js";
  */
 export const getAllProducts = async () => {
     try {
+        console.log(information("Querying all products..."))
         const allProducts = await Product.find({});
+
         return allProducts;
-    } catch (err) {
-        console.error(err);   
+
+    } catch (err) {  
+        console.error(errorAlert("", err));
     }
 }
 
@@ -27,10 +30,13 @@ export const getProductById = async (_id) => {
     if (!_id) return null;
 
     try {
+        console.log(information(`Querying products by _id: ${informationHeading(_id)}`))
         const product = await Product.findById(_id);
+
         return product;
+
     } catch (err) {
-        console.error(err);
+        console.error(errorAlert("", err));
     }
 }
 
@@ -43,15 +49,16 @@ export const getProductById = async (_id) => {
 export const getProductByTitle = async (title) => {
     if (!title) return [];
 
-    console.log("Searching exact match for: ", title)
     try {
+        console.log(information(`Querying exact match for title: ${informationHeading(title)}`))
         const product = await Product.find({
             title: { $regex: `^${title}$`, $options: "i" }
         });
 
         return product
+
     } catch (err) {
-        console.error(err);
+        console.error(errorAlert("", err));
     }
 }
 
@@ -64,15 +71,16 @@ export const getProductByTitle = async (title) => {
 export const getProductByTitlePartialMatch = async (title) => {
     if (!title) return []; // If no product is entered. Return empty array.
 
-    console.log("Searching partial match for: ", title);
+    console.log(information(`Querying partial match for title: ${informationHeading(title)}`))
     try {
         const product = await Product.find({
             title: { $regex: title, $options: "i" }
         });
+
         return product;
 
     } catch (err) {
-        console.error(err);
+        console.error(errorAlert("", err));
     }
 }
 
@@ -88,6 +96,7 @@ export const getProductsByKeywords = async (keywords) => {
     const searchKeywords  = keywords.join(" ");
 
     try {
+        console.log(information(`Querying by keywords: ${informationHeading(keywords)}`))
         const products = await Product.find(
             { $text: { $search: searchKeywords } },
             { score: { $meta: "textScore" } }
@@ -96,7 +105,7 @@ export const getProductsByKeywords = async (keywords) => {
         return products;
 
     } catch (err) {
-        console.error(err);
+        console.error(errorAlert("", err));
     }
 }
 
@@ -111,8 +120,7 @@ export const getProductsByKeywords = async (keywords) => {
  */
 export const addProduct = async (title, description = "", startPrice, reservePrice) => {
     if (!title || isNaN(startPrice) || isNaN(reservePrice)) {
-        console.error("Missing required data fields, or invalid data types.");
-        return;
+        throw new Error("Missing required data fields, or invalid data types.");
     }
 
     try {
@@ -122,12 +130,12 @@ export const addProduct = async (title, description = "", startPrice, reservePri
             startPrice: Number(startPrice),
             reservePrice: Number(reservePrice)
         });
-        
         await newProduct.save();
+
         return newProduct;
 
     } catch (err) {
-        console.error(err);
+        console.error(errorAlert("", err));
     }
 }
 
@@ -143,12 +151,13 @@ export const addProductsFromList = async (arrayOfProducts) => {
             throw new Error("Type Error: Please enter a valid array")
         };
 
-        console.log("Products to Insert: ", arrayOfProducts)
+        console.log(information("Inserting products: "), arrayOfProducts)
         await Product.insertMany(arrayOfProducts);
+
         return;
 
     } catch (err) {
-        console.error(err);
+        console.error(errorAlert("", err));
     }
 }
 
@@ -163,11 +172,11 @@ export const deleteProductById = async (_id) => {
 
     try {
         const deletedProduct = await Product.deleteOne({_id});
-        console.info(chalk.green.bold("Product has been deleted: "), deletedProduct);
+        console.info(success("Product has been deleted: "), deletedProduct);
         return;
 
     } catch (err) {
-        console.error(err);
+        console.error(errorAlert("", err));
     }
 }
 
@@ -179,10 +188,10 @@ export const deleteProductById = async (_id) => {
 export const deleteAllProducts = async () => {
     try {
         await Product.deleteMany({});
-        console.info(chalk.green.bold("Database has been cleared!"));
+        console.info(success("Database has been cleared!"));
         return;
 
     } catch (err) {
-        console.error(err);
+        console.error(errorAlert("", err));
     }
 }
