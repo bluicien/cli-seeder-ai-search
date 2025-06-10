@@ -1,4 +1,5 @@
 // productsRoutes.js
+
 import { Router } from "express";
 import { allProducts, searchByPhrase, productByTitle } from "../controllers/productsController.js";
 
