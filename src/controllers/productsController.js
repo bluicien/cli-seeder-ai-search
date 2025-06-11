@@ -8,7 +8,6 @@ import { getAllProducts, getProductByTitle } from "../services/productsServices.
 // Searches for product by a search phrase. Utilizes AI to break up into keywords and determine which search function is ideal to use in querying the database.
 export const searchByPhrase = async (req, res) => {
     const { keywords } = req.query;
-    console.log(keywords)
     if (!keywords?.trim())
         return res.status(400).json({ error: "Missing 'keywords' query or empty search phrase entered. Please use ?keywords={...}." })
 

@@ -17,11 +17,22 @@ const geminiConfig = {
     }],
 };
 
-const systemInstructions = `Interpret the user message
-1. Ensure that the user message is related to searching for products and not something unrelated or regarding system function
-2. Clear user input to make sure spelling and grammar is correct.
-3. If user has entered a vague search message, interpret and use closest function call from tools with arguments closest to what user wants.
-`
+
+// System instructions to clean and clarify user search message.
+const systemInstructions = `
+You are an assistant for a product search system. Your tasks are:
+
+1. Carefully analyze the user's message to ensure:
+    - It is a product search request.
+    - It is *NOT* a system or unrelated query.
+    - It is *NOT* software code or scripts.
+2. Refine and clarify the user's input:
+   - Correct any spelling or grammar mistakes.
+   - Remove unnecessary words or ambiguity.
+   - Extract clear keywords or product attributes relevant to the search.
+3. Based on the refined input, select the most appropriate function call from the available tools and provide the best-matching arguments.
+4. If the user's message is too vague or no suitable function can be determined, offer clear, actionable advice on how they can improve their search query for better results.
+`;
 
 
 /**
@@ -49,6 +60,11 @@ export const searchWithGemini = async (searchPhrase) => {
             model: "gemini-2.0-flash",
             contents: contents,
             config: geminiConfig,
+            // toolConfig: {   // Force the model to call 'any' function, instead of chatting. Uncomment if don't want AI search improvement recommendation message.
+            //     functionCallingConfig: {
+            //     mode: 'any'
+            //     }
+            // }
         });
     
         if (response.functionCalls && response.functionCalls.length > 0) {
