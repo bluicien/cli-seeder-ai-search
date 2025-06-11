@@ -1,7 +1,7 @@
 // productsServices.js
 
 import { Product } from "../models/product.js";
-import { errorAlert, information, success } from "../utils/chalkSchema.js";
+import { errorAlert, information, success, informationHeading } from "../utils/chalkSchema.js";
 
 
 /**
