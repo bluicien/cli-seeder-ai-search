@@ -1,13 +1,15 @@
+// cliPrompts.js
+
 import inquirer from "inquirer";
 import { parseCsvToJson } from "./fileParseUtil.js";
-import chalk from "chalk";
-import { addProduct, addProductsFromList } from "../services/productServices.js";
+import { addProduct, addProductsFromList } from "../services/productsServices.js";
+import { dangerAlert, exitInfo, information, prompting } from "../utils/chalkSchema.js";
 
 const FILE_ENTRY="file";
 const MANUAL_ENTRY="manual";
 
 process.on("SIGINT", () => {
-    console.log("\n" + chalk.yellow("Exiting Program..."));
+    console.log("\n" + exitInfo("Exiting Program..."));
     process.exit(0);
 });
 
@@ -17,24 +19,35 @@ export const dataSeedingManager = async () => {
         const seedMethod = await getSeedingMethod();
     
         if (seedMethod === MANUAL_ENTRY) {
+
+            
             let continueManualEntry = false;
             do {
+                console.info(information("===== MANUAL ENTRY ====="));
                 const newProductData = await manualDataEntry();
                 const { title, description, startPrice, reservePrice } = newProductData;
                 await addProduct( title, description, startPrice, reservePrice );
 
                 continueManualEntry = await askUserContinueManualInput();
+
             } while (continueManualEntry);
+
+            return;
+
         } else if (seedMethod === FILE_ENTRY) {
+
+            console.info(information("===== FILE ENTRY ====="));
+            
             const filePath = await fileDataEntry()
             const dataToSeed = await (filePath ? parseCsvToJson(filePath) : parseCsvToJson());
             
             await addProductsFromList(dataToSeed);
+            
             return;
         }
     } catch (err) {
         if (err && err.name === "ExitPromptError") {
-            console.log(chalk.yellow("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));
+            console.log(exitInfo("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));
             process.exit(0);
         }
         throw err;        
@@ -46,19 +59,11 @@ export const deleteAllConfirm = async () => {
     const question = [{
         type: "confirm",
         name: "deleteConfirm",
-        message: chalk.redBright("WARNING: Are you sure you want to delete all entries from database? This move cannot be undone")
+        message: dangerAlert("WARNING: Are you sure you want to delete all entries from database? This move cannot be undone")
     }];
 
-    try {
-        const answer = await inquirer.prompt(question);
-        return answer.deleteConfirm;
-    } catch (err) {
-        if (err && err.name === "ExitPromptError") {
-            console.log(chalk.yellow("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));
-            process.exit(0);
-        }
-        throw err;
-    }
+    const answer = await promptWithErrorHandling(question);
+    return answer.deleteConfirm;
 }
 
 
@@ -79,16 +84,9 @@ async function getSeedingMethod() {
             }
         ]
     }];
-    try {
-        const answer = await inquirer.prompt(question);
-        return answer.seedMethod;
-    } catch (err) {
-        if (err && err.name === "ExitPromptError") {
-            console.log(chalk.yellow("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));
-            process.exit(0);
-        }
-        throw err;
-    }
+
+    const answer = await promptWithErrorHandling(question);
+    return answer.seedMethod;
 }
 
 
@@ -126,17 +124,9 @@ async function manualDataEntry() {
             }
         },
     ];
-    
-    try {
-        const answers = await inquirer.prompt(questions);
-        return answers
-    } catch (err) {
-        if (err && err.name === "ExitPromptError") {
-            console.log(chalk.yellow("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));
-            process.exit(0);
-        }
-        throw err;
-    }
+
+    const answers = await promptWithErrorHandling(questions);
+    return answers;
 }
 
 
@@ -148,16 +138,8 @@ async function askUserContinueManualInput() {
         message: "Do you want to continue manual entry?"
     }];
 
-    try {
-        const answer = await inquirer.prompt(question);
-        return answer.continueEntry;
-    } catch (err) {
-        if (err && err.name === "ExitPromptError") {
-            console.log(chalk.yellow("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));
-            process.exit(0);
-        }
-        throw err;        
-    }
+    const answer = await promptWithErrorHandling(question);
+    return answer.continueEntry;
 }
 
 
@@ -170,16 +152,22 @@ async function fileDataEntry() {
             message: "Please enter the path to you file data (CSV/JSON): "
         }
     ];
-    
-    try {
-        const answer = await inquirer.prompt(question);
-        return answer.dataFilePath;
-    } catch (err) {
-        if (err && err.name === "ExitPromptError") {
-            console.log(chalk.yellow("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));
-            process.exit(0);
-        }
-        throw err;
-    }
+
+    const answer = await promptWithErrorHandling(question);
+    return answer.dataFilePath;
 }
 
+
+async function promptWithErrorHandling(questions) {
+    try {
+        const questionsWithChalk = questions?.map(question => ({...question, message: prompting(question.message)}));
+        const answer = await inquirer.prompt(questionsWithChalk);
+        return answer;
+    } catch (err) {
+        if (err?.name === "ExitPromptError") {
+            console.log(exitInfo("\nPrompt cancelled by user (Ctrl+C). Exiting cleanly."));
+            process.exit(0);
+        }
+        throw err;        
+    }
+}

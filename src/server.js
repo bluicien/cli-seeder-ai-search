@@ -1,32 +1,29 @@
+// server.js
+
+// Package imports.
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 
+// File imports.
 import { connectMongoDB } from "./db/db.js";
+import productsRouter from "./routes/productsRoutes.js";
+import config from "./config/config.js";
 
-dotenv.config();
+const app = express(); // Initialize express.
 
-const app = express();
-const port = process.env.PORT;
+app.use(cors()); // Set cors policy.
+app.use(express.json()); // Parse json in request body.
 
-app.use(cors());
-app.use(express.json());
+connectMongoDB(); // Connect to MongoDB server.
 
-connectMongoDB();
-
+// Test endpoint.
 app.get("/", (req, res) => {
     res.send("Server is running.");
 });
 
+app.use("/api/products", productsRouter); // Connect to productsRouter.
 
-
-
-
-
-
-
-
-
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+// Set port for server to listen on.
+app.listen(config.port, () => {
+    console.log(`Server is running on http://localhost:${config.port}`);
 })
